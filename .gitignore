@@ -1,0 +1,12 @@
+# Ignorar pastas de build do PyInstaller
+build/
+dist/
+*.spec
+
+# Ignorar cache do Python
+__pycache__/
+*.pyc
+
+# Ignorar arquivos de sistema
+.DS_Store
+Thumbs.db
