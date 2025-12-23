@@ -1,48 +1,62 @@
-# Gerador de Scripts de Provisionamento OLT ZTE Titan
+Gerador de Scripts de Provisionamento — OLT ZTE Titan
+📌 Sobre o Projeto
 
-## Como Usar
+Ferramenta desktop com interface gráfica (GUI) desenvolvida em Python para automatizar a geração de scripts de provisionamento em massa para OLTs ZTE Titan.
 
-### Passo a Passo
-1. Execute o arquivo `Gerador OLT.exe`.
-2. Insira o número da **PON** de destino.
-3. Insira a VLAN de serviço correspondente.
-4. Clique em GERAR SCRIPT.
-5. O sistema gerará um arquivo `.txt` contendo os comandos CLI para provisionar todas as 128 posições da porta.
-6. Copie o conteúdo e aplique no terminal da OLT ZTE.
+O projeto foi criado para atender demandas reais do NOC, especialmente em cenários de:
 
+migração de clientes entre OLTs
 
+ativação de novas portas PON
 
-## Sobre o Projeto
+janelas de manutenção com tempo crítico
 
-Este projeto consiste em uma ferramenta Desktop com Interface Gráfica (GUI) para gerar scripts de configuração em massa para a OLT ZTE Titan.
+O objetivo é reduzir erros manuais, aumentar a velocidade operacional e minimizar downtime.
 
-A solução foi criada para atender demandas do NOC, especificamente em cenários de **migração de clientes entre OLTs** e ativação de novas portas PON, onde a velocidade e a precisão são cruciais para minimizar o tempo de inatividade (downtime).
+ Funcionalidades
 
-### Funcionalidades
+Provisionamento em massa: geração automática de configuração para até 128 ONUs por PON
 
-- **Provisionamento em Massa:** Gera a configuração completa para 128 ONUs simultaneamente.
-- **Interface Visual:** GUI desenvolvida com `tkinter` para agilizar a operação durante janelas de manutenção.
-- **Input Dinâmico:** Definição rápida de PON e VLAN para adaptação a diferentes cenários de rede.
-- **Segurança Operacional:** Validação de entradas para evitar erros de sintaxe nos comandos enviados à OLT.
-- **Portabilidade:** Executável standalone (.exe) para uso em qualquer estação de trabalho.
+Interface gráfica (GUI): desenvolvida com Tkinter para facilitar o uso em ambientes operacionais
 
----
+Input dinâmico: definição de PON e VLAN conforme o cenário da rede
 
-## Tecnologias Utilizadas
+Validação de dados: verificação de faixa válida para PON e VLAN, evitando erros de sintaxe
 
-- Linguagem: [Python 3](https://www.python.org/)
-- Interface Gráfica: Tkinter
-- Compilação:** PyInstaller
-- Versionamento:** Git & GitHub
+Portabilidade: aplicação compilada em .exe, sem necessidade de ambiente Python instalado
 
----
+Como usar
 
-## Evolução: Scripting para Automação GUI
+Execute o arquivo Gerador OLT.exe
 
-Anteriormente, as migrações dependiam de edição manual de arquivos em lote (.bat), o que era propenso a erros e lento para grandes volumes.
+Insira o número da PON de destino
 
-Vantagens da nova versão Python:
-1.  Eficiência: Geração instantânea de scripts complexos.
-2.  Confiabilidade: Eliminação de erros de digitação comuns em operações de terminal.
-3. Escalabilidade: Código preparado para futuras implementações e novas regras de negócio da rede.
+Insira a VLAN de serviço
 
+Clique em GERAR SCRIPT
+
+O sistema irá gerar um arquivo .txt com os comandos CLI
+
+Copie o conteúdo e aplique no terminal da OLT ZTE Titan
+
+🛠️ Tecnologias Utilizadas
+
+Linguagem: Python 3
+
+Interface Gráfica: Tkinter
+
+Compilação: PyInstaller
+
+Versionamento: Git & GitHub
+
+ Evolução do Projeto
+
+Inicialmente, o processo de migração era feito através da edição manual de arquivos em lote (.bat), o que se mostrava lento e altamente propenso a erros.
+
+Vantagens da versão em Python
+
+Eficiência: geração instantânea de scripts complexos
+
+Confiabilidade: redução de erros humanos durante a configuração
+
+Escalabilidade: código preparado para novas regras de negócio e futuras melhorias
