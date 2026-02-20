@@ -1,6 +1,6 @@
 ![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python)
 ![Tkinter](https://img.shields.io/badge/Interface-Tkinter-green?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Funcional-brightgreen?style=for-the-badge)
+
 
 ## 📌 Sobre o Projeto
 
