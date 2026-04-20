@@ -15,6 +15,13 @@ COR_BOTAO3 = "#6c757d"
 COR_INFO = "#17a2b8"
 
 
+def resource_path(filename):
+    """Localiza arquivo tanto no modo script quanto no exe gerado pelo PyInstaller."""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(os.path.abspath('.'), filename)
+
+
 def abrir_pasta(caminho):
     if sys.platform == "win32":
         os.startfile(caminho)
@@ -27,7 +34,7 @@ def abrir_pasta(caminho):
 def validar_int(valor, nome, minimo, maximo):
     valor = valor.strip()
     if not valor.isdigit():
-        raise ValueError(f"'{nome}' deve ser um número inteiro.")
+        raise ValueError(f"'{nome}' deve ser um n\u00famero inteiro.")
     n = int(valor)
     if not (minimo <= n <= maximo):
         raise ValueError(f"'{nome}' deve estar entre {minimo} e {maximo}.")
@@ -85,6 +92,10 @@ class App(tk.Tk):
         self.resizable(True, True)
         self.configure(bg=COR_FUNDO)
         self._ultima_pasta = os.getcwd()
+        try:
+            self.iconbitmap(resource_path('iconbc.ico'))
+        except Exception:
+            pass
         self._criar_variaveis()
         self._criar_interface()
         self._carregar_perfil_auto()
@@ -126,7 +137,7 @@ class App(tk.Tk):
 
     def _criar_interface(self):
         tk.Label(
-            self, text="Gerador OLT ZTE — Barra Connect",
+            self, text="Gerador OLT ZTE \u2014 Barra Connect",
             font=("Arial", 14, "bold"), bg=COR_FUNDO
         ).pack(pady=(15, 2))
         tk.Label(
