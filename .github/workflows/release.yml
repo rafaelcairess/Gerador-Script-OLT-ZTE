@@ -1,0 +1,73 @@
+name: Build e Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          pip install customtkinter pyinstaller
+
+      - name: Compilar .exe com PyInstaller
+        run: |
+          pyinstaller --onefile --windowed --noconsole `
+            --name "GeradorOLT-ZTE" `
+            --icon "iconbc.ico" `
+            --add-data "iconbc.ico;." `
+            zte.PY
+
+      - name: Upload artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: GeradorOLT-ZTE-windows
+          path: dist/GeradorOLT-ZTE.exe
+
+  release:
+    needs: build-windows
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artefato
+        uses: actions/download-artifact@v4
+        with:
+          name: GeradorOLT-ZTE-windows
+          path: dist/
+
+      - name: Criar Release no GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Gerador OLT ZTE ${{ github.ref_name }}"
+          body: |
+            ## Gerador de Script OLT ZTE — ${{ github.ref_name }}
+
+            ### Download
+            Baixe o arquivo **GeradorOLT-ZTE.exe** abaixo e execute diretamente — sem instalação.
+
+            ### Requisitos
+            - Windows 10 ou superior
+            - Nenhuma instalação necessária (standalone)
+
+            ### Como usar
+            1. Baixe `GeradorOLT-ZTE.exe`
+            2. Execute o arquivo
+            3. Preencha os campos e clique em **GERAR SCRIPT**
+          draft: false
+          prerelease: false
+          files: dist/GeradorOLT-ZTE.exe
