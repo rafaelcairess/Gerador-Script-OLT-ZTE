@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      versao:
+        description: "Versao da release (ex: v1.0.0)"
+        required: true
+        default: "v1.0.0"
 
 permissions:
   contents: write
@@ -50,12 +56,22 @@ jobs:
           name: GeradorOLT-ZTE-windows
           path: dist/
 
+      - name: Definir nome da versao
+        id: versao
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.versao }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Criar Release no GitHub
         uses: softprops/action-gh-release@v2
         with:
-          name: "Gerador OLT ZTE ${{ github.ref_name }}"
+          tag_name: ${{ steps.versao.outputs.tag }}
+          name: "Gerador OLT ZTE ${{ steps.versao.outputs.tag }}"
           body: |
-            ## Gerador de Script OLT ZTE — ${{ github.ref_name }}
+            ## Gerador de Script OLT ZTE — ${{ steps.versao.outputs.tag }}
 
             ### Download
             Baixe o arquivo **GeradorOLT-ZTE.exe** abaixo e execute diretamente — sem instalação.
