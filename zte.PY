@@ -2,7 +2,6 @@ import sys
 import os
 import subprocess
 
-# customtkinter requer python3.12+ neste ambiente (python3.12 -m pip install customtkinter)
 try:
     import customtkinter as ctk
 except ModuleNotFoundError:
@@ -17,7 +16,6 @@ from gerador import (
 )
 from perfis import CONFIG_FILE, salvar_perfil, carregar_perfil, carregar_perfil_auto
 
-ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
 
@@ -34,9 +32,11 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Gerador OLT ZTE - Barra Connect")
-        self.geometry("700x780")
-        self.resizable(True, True)
+        self.geometry("720x820")
+        self.minsize(680, 680)
         self._ultima_pasta = os.getcwd()
+        self._modo_escuro = False
+        ctk.set_appearance_mode("light")
         self._criar_variaveis()
         self._criar_interface()
         self._aplicar_perfil_inicial()
@@ -60,17 +60,31 @@ class App(ctk.CTk):
     # ---------------------------------------------------------------- layout
 
     def _criar_interface(self):
+        header = ctk.CTkFrame(self, fg_color="transparent")
+        header.pack(fill="x", padx=16, pady=(14, 0))
+
         ctk.CTkLabel(
-            self, text="Gerador OLT ZTE — Barra Connect",
-            font=ctk.CTkFont(size=16, weight="bold"),
-        ).pack(pady=(15, 2))
+            header,
+            text="Gerador OLT ZTE - Barra Connect",
+            font=ctk.CTkFont(size=17, weight="bold"),
+        ).pack(side="left")
+
+        self.btn_tema = ctk.CTkButton(
+            header, text="Modo Escuro", width=110,
+            fg_color="transparent", border_width=1,
+            text_color=("gray20", "gray80"),
+            hover_color=("gray90", "gray30"),
+            command=self._toggle_tema,
+        )
+        self.btn_tema.pack(side="right")
+
         ctk.CTkLabel(
             self, text="OLT ZTE TITAN",
             font=ctk.CTkFont(size=11), text_color="gray",
-        ).pack(pady=(0, 5))
+        ).pack(pady=(2, 8))
 
         self.tabview = ctk.CTkTabview(self)
-        self.tabview.pack(fill="both", expand=True, padx=10, pady=5)
+        self.tabview.pack(fill="both", expand=True, padx=12, pady=(0, 4))
 
         self.tab_config = self.tabview.add("  Configuracao  ")
         self.tab_script = self.tabview.add("  Script Gerado  ")
@@ -81,79 +95,110 @@ class App(ctk.CTk):
         ctk.CTkLabel(
             self, text="By Rafael Caires & Lucas Alexandre",
             font=ctk.CTkFont(size=9), text_color="gray",
-        ).pack(side="bottom", pady=5)
+        ).pack(side="bottom", pady=(0, 6))
+
+    def _toggle_tema(self):
+        self._modo_escuro = not self._modo_escuro
+        if self._modo_escuro:
+            ctk.set_appearance_mode("dark")
+            self.btn_tema.configure(text="Modo Claro")
+        else:
+            ctk.set_appearance_mode("light")
+            self.btn_tema.configure(text="Modo Escuro")
 
     def _secao(self, parent, titulo: str) -> ctk.CTkFrame:
-        frame = ctk.CTkFrame(parent)
-        frame.pack(fill="x", padx=10, pady=5)
+        frame = ctk.CTkFrame(parent, corner_radius=8)
+        frame.pack(fill="x", padx=4, pady=(0, 8))
+        frame.columnconfigure(1, weight=1)
+        frame.columnconfigure(3, weight=1)
         ctk.CTkLabel(
             frame, text=titulo,
-            font=ctk.CTkFont(size=11, weight="bold"),
-        ).grid(row=0, column=0, columnspan=4, sticky="w", padx=12, pady=(8, 2))
+            font=ctk.CTkFont(size=12, weight="bold"),
+        ).grid(row=0, column=0, columnspan=4, sticky="w", padx=14, pady=(10, 4))
         return frame
 
     def _campo(self, parent, label: str, var, row: int, col: int = 0,
-               width: int = 100, values=None):
-        r = row + 1  # linha 0 é o título da seção
+               width: int = 110, values=None, columnspan: int = 1):
+        r = row + 1
         ctk.CTkLabel(parent, text=label, font=ctk.CTkFont(size=11)).grid(
-            row=r, column=col, sticky="w", padx=(12, 2), pady=4,
+            row=r, column=col, sticky="w", padx=(14, 4), pady=6,
         )
         if values:
             w = ctk.CTkComboBox(parent, variable=var, values=values,
                                 width=width, state="readonly")
         else:
             w = ctk.CTkEntry(parent, textvariable=var, width=width)
-        w.grid(row=r, column=col + 1, sticky="w", padx=(2, 12), pady=4)
+        w.grid(row=r, column=col + 1, columnspan=columnspan,
+               sticky="w", padx=(4, 14), pady=6)
         return w
 
     def _criar_tab_config(self):
         p = self.tab_config
 
-        sec_olt = self._secao(p, "Enderecamento da OLT")
-        self._campo(sec_olt, "Slot:", self.var_slot, 0, 0, width=90)
-        self._campo(sec_olt, "Card:", self.var_card, 0, 2, width=90)
-        self._campo(sec_olt, "PON Inicial:", self.var_pon_ini, 1, 0, width=90)
-        self._campo(sec_olt, "PON Final:", self.var_pon_fim, 1, 2, width=90)
+        # Barra de acao fixada na base, empacotada antes do scroll
+        action_bar = ctk.CTkFrame(p, fg_color="transparent")
+        action_bar.pack(fill="x", side="bottom", pady=(6, 2))
 
-        sec_svc = self._secao(p, "Configuracao de Servico")
-        self._campo(sec_svc, "VLAN Principal:", self.var_vlan, 0, 0, width=100)
+        self.lbl_status = ctk.CTkLabel(
+            action_bar, text="",
+            font=ctk.CTkFont(size=11),
+            text_color=("green4", "lime green"),
+        )
+        self.lbl_status.pack(side="right", padx=14)
+
+        ctk.CTkButton(
+            action_bar,
+            text="GERAR SCRIPT",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            height=46, width=210,
+            fg_color="#1a73e8", hover_color="#1558b0",
+            command=self._gerar,
+        ).pack(side="left", padx=14)
+
+        # Conteudo com scroll
+        scroll = ctk.CTkScrollableFrame(p, fg_color="transparent")
+        scroll.pack(fill="both", expand=True, padx=0, pady=0)
+
+        sec_olt = self._secao(scroll, "Enderecamento da OLT")
+        self._campo(sec_olt, "Slot:", self.var_slot, 0, 0, width=100)
+        self._campo(sec_olt, "Card:", self.var_card, 0, 2, width=100)
+        self._campo(sec_olt, "PON Inicial:", self.var_pon_ini, 1, 0, width=100)
+        self._campo(sec_olt, "PON Final:", self.var_pon_fim, 1, 2, width=100)
+
+        sec_svc = self._secao(scroll, "Configuracao de Servico")
+        self._campo(sec_svc, "VLAN Principal:", self.var_vlan, 0, 0, width=110)
         self._campo(sec_svc, "Perfil TCONT:", self.var_perfil, 0, 2,
-                    width=150, values=PERFIS_TCONT)
-        self._campo(sec_svc, "ONU Inicial:", self.var_onu_ini, 1, 0, width=90)
-        self._campo(sec_svc, "ONU Final:", self.var_onu_fim, 1, 2, width=90)
-        self._campo(sec_svc, "Prefixo Nome:", self.var_prefixo, 2, 0, width=280)
+                    width=160, values=PERFIS_TCONT)
+        self._campo(sec_svc, "ONU Inicial:", self.var_onu_ini, 1, 0, width=100)
+        self._campo(sec_svc, "ONU Final:", self.var_onu_fim, 1, 2, width=100)
+        self._campo(sec_svc, "Prefixo Nome:", self.var_prefixo, 2, 0,
+                    width=300, columnspan=3)
 
-        sec_s2 = self._secao(p, "Servico Adicional (VoIP / IPTV)")
+        sec_s2 = self._secao(scroll, "Servico Adicional (VoIP / IPTV)")
         ctk.CTkCheckBox(
             sec_s2, text="Habilitar segundo servico (gemport 2)",
             variable=self.var_servico2, command=self._toggle_servico2,
-        ).grid(row=1, column=0, columnspan=4, sticky="w", padx=12, pady=4)
+        ).grid(row=1, column=0, columnspan=4, sticky="w", padx=14, pady=6)
         ctk.CTkLabel(sec_s2, text="VLAN Servico 2:",
                      font=ctk.CTkFont(size=11)).grid(
-            row=2, column=0, sticky="w", padx=(12, 2), pady=4,
+            row=2, column=0, sticky="w", padx=(14, 4), pady=(0, 12),
         )
         self.entry_vlan2 = ctk.CTkEntry(
-            sec_s2, textvariable=self.var_vlan2, width=100, state="disabled",
+            sec_s2, textvariable=self.var_vlan2, width=110, state="disabled",
         )
-        self.entry_vlan2.grid(row=2, column=1, sticky="w", padx=(2, 12), pady=4)
+        self.entry_vlan2.grid(row=2, column=1, sticky="w",
+                              padx=(4, 14), pady=(0, 12))
 
-        sec_perf = self._secao(p, "Perfil de Configuracao")
+        sec_perf = self._secao(scroll, "Perfil de Configuracao")
         ctk.CTkButton(
-            sec_perf, text="Salvar Perfil", width=140,
+            sec_perf, text="Salvar Perfil", width=150,
             command=self._salvar_perfil,
-        ).grid(row=1, column=0, padx=(12, 5), pady=10, sticky="w")
+        ).grid(row=1, column=0, columnspan=2, padx=(14, 5), pady=(6, 14), sticky="w")
         ctk.CTkButton(
-            sec_perf, text="Carregar Perfil", width=140,
-            fg_color="gray", hover_color="#555",
+            sec_perf, text="Carregar Perfil", width=150,
+            fg_color="gray50", hover_color="#444",
             command=self._carregar_perfil,
-        ).grid(row=1, column=1, padx=5, pady=10, sticky="w")
-
-        ctk.CTkButton(
-            p, text="GERAR SCRIPT",
-            font=ctk.CTkFont(size=14, weight="bold"),
-            height=48, width=230,
-            command=self._gerar,
-        ).pack(pady=15)
+        ).grid(row=1, column=2, columnspan=2, padx=(5, 14), pady=(6, 14), sticky="w")
 
     def _criar_tab_script(self):
         p = self.tab_script
@@ -168,17 +213,17 @@ class App(ctk.CTk):
         frame_btn.pack(pady=8)
 
         ctk.CTkButton(
-            frame_btn, text="Copiar para Clipboard", width=180,
+            frame_btn, text="Copiar para Clipboard", width=190,
             fg_color="#28a745", hover_color="#1e7e34",
             command=self._copiar,
         ).pack(side="left", padx=5)
         ctk.CTkButton(
-            frame_btn, text="Salvar Arquivo", width=140,
+            frame_btn, text="Salvar Arquivo", width=150,
             command=self._salvar_arquivo,
         ).pack(side="left", padx=5)
         ctk.CTkButton(
             frame_btn, text="Abrir Pasta", width=130,
-            fg_color="gray", hover_color="#555",
+            fg_color="gray50", hover_color="#444",
             command=self._abrir_pasta_atual,
         ).pack(side="left", padx=5)
 
@@ -218,6 +263,7 @@ class App(ctk.CTk):
         )
 
     def _gerar(self):
+        self.lbl_status.configure(text="")
         try:
             cfg = self._coletar_config()
         except ValueError as e:
@@ -232,12 +278,8 @@ class App(ctk.CTk):
         self.text_script.configure(state="disabled")
 
         total = (cfg.pon_fim - cfg.pon_ini + 1) * (cfg.onu_fim - cfg.onu_ini + 1)
-        messagebox.showinfo(
-            "Script Gerado",
-            f"Script gerado com sucesso!\n"
-            f"PONs: {cfg.pon_ini} ate {cfg.pon_fim}  |  ONUs: {cfg.onu_ini} ate {cfg.onu_fim}\n"
-            f"Total configurado: {total} ONU(s)\n\n"
-            f"Veja o resultado na aba 'Script Gerado'.",
+        self.lbl_status.configure(
+            text=f"OK  {total} ONU(s) | PON {cfg.pon_ini}->{cfg.pon_fim} | VLAN {cfg.vlan}"
         )
         self.tabview.set("  Script Gerado  ")
 
