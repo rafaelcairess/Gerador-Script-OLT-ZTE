@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>GeradorOlt.Apresentacao</RootNamespace>
+    <AssemblyName>GeradorOlt-ZTE</AssemblyName>
+    <ApplicationIcon>..\..\icone.ico</ApplicationIcon>
+    <Version>2.0.0</Version>
+    <Authors>Rafael Caires; Lucas Alexandre</Authors>
+    <Description>Gerador de scripts de provisionamento para OLTs ZTE Titan.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeradorOlt.Nucleo\GeradorOlt.Nucleo.csproj" />
+    <ProjectReference Include="..\GeradorOlt.Infraestrutura\GeradorOlt.Infraestrutura.csproj" />
+    <Resource Include="..\..\icone.ico" Link="Assets\icone.ico" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,114 @@
+<Window
+    x:Class="GeradorOlt.Apresentacao.JanelaPrincipal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:views="clr-namespace:GeradorOlt.Apresentacao.Telas"
+    Title="Gerador de Scripts OLT ZTE"
+    Width="1220"
+    Height="780"
+    MinWidth="1040"
+    MinHeight="680"
+    Background="{StaticResource BackgroundBrush}"
+    Foreground="{StaticResource TextBrush}"
+    Icon="Assets/icone.ico"
+    WindowStartupLocation="CenterScreen">
+
+    <Window.InputBindings>
+        <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding GenerateCommand}" />
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding ExportCommand}" />
+        <KeyBinding Key="C" Modifiers="Control+Shift" Command="{Binding CopyCommand}" />
+    </Window.InputBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="76" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border
+            Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="0,0,0,1">
+            <Grid Margin="28,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <Border
+                        Width="40"
+                        Height="40"
+                        Background="{StaticResource AccentBrush}"
+                        CornerRadius="10">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Text="ZTE" />
+                    </Border>
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="16"
+                            FontWeight="SemiBold"
+                            Text="Gerador de Scripts OLT ZTE" />
+                        <TextBlock
+                            Margin="0,2,0,0"
+                            FontSize="10"
+                            Foreground="{StaticResource MutedTextBrush}"
+                            Text="Provisionamento rápido, seguro e padronizado" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button
+                        Command="{Binding NewScenarioCommand}"
+                        Content="Novo"
+                        Style="{StaticResource TextButtonStyle}" />
+                    <Button
+                        Margin="4,0,0,0"
+                        Command="{Binding LoadProfileCommand}"
+                        Content="Carregar perfil"
+                        Style="{StaticResource TextButtonStyle}" />
+                    <Button
+                        Margin="4,0,14,0"
+                        Command="{Binding AboutCommand}"
+                        Content="Sobre"
+                        Style="{StaticResource TextButtonStyle}" />
+                    <Border
+                        Padding="10,7"
+                        Background="{StaticResource SuccessSoftBrush}"
+                        BorderBrush="{StaticResource SuccessBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="16">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse
+                                Width="7"
+                                Height="7"
+                                Margin="0,0,7,0"
+                                Fill="{StaticResource SuccessBrush}" />
+                            <TextBlock
+                                FontSize="10"
+                                FontWeight="SemiBold"
+                                Foreground="{StaticResource SuccessBrush}"
+                                Text="Pronto" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="28,24,28,26">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="430" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <views:PainelConfiguracao Grid.Column="0" />
+            <views:PainelVisualizacaoScript Grid.Column="2" />
+        </Grid>
+    </Grid>
+</Window>

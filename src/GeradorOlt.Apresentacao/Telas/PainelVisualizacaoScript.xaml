@@ -1,0 +1,202 @@
+<UserControl
+    x:Class="GeradorOlt.Apresentacao.Telas.PainelVisualizacaoScript"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70" />
+            <RowDefinition Height="14" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Padding="14,10" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="{Binding TotalPons}" />
+                    <TextBlock Margin="0,2,0,0" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Text="PONs" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Padding="14,10" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="{Binding TotalOnus}" />
+                    <TextBlock Margin="0,2,0,0" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Text="ONUs" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="4" Padding="14,10" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="{Binding TotalServices}" />
+                    <TextBlock Margin="0,2,0,0" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Text="Serviços" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="6" Padding="14,10" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding TotalLines}" />
+                    <TextBlock Margin="0,5,0,0" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Text="Tamanho" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="58" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="66" />
+                    <RowDefinition Height="42" />
+                </Grid.RowDefinitions>
+
+                <Border
+                    Padding="18,0"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,0,0,1">
+                    <Grid>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock FontSize="13" FontWeight="SemiBold" Text="Preview do script" />
+                            <TextBlock
+                                Margin="0,2,0,0"
+                                FontSize="9"
+                                Foreground="{StaticResource MutedTextBrush}"
+                                Text="Revise os comandos antes de exportar" />
+                        </StackPanel>
+
+                        <Border
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Padding="9,5"
+                            CornerRadius="12">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{StaticResource SuccessSoftBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="6" Height="6" Margin="0,0,6,0">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                                    <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                                <TextBlock FontSize="9" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                            <Setter Property="Text" Value="VALIDADO" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                                    <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                                    <Setter Property="Text" Value="REVISAR" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <TextBox
+                    Grid.Row="1"
+                    Padding="18,15"
+                    AcceptsReturn="True"
+                    AcceptsTab="True"
+                    Background="{StaticResource CodeBackgroundBrush}"
+                    BorderThickness="0"
+                    FontFamily="Consolas"
+                    FontSize="11"
+                    Foreground="{StaticResource CodeTextBrush}"
+                    HorizontalScrollBarVisibility="Auto"
+                    IsReadOnly="True"
+                    Text="{Binding ScriptPreview, Mode=OneWay}"
+                    VerticalContentAlignment="Top"
+                    VerticalScrollBarVisibility="Auto" />
+
+                <Grid Grid.Row="2" Margin="16,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Ellipse Width="7" Height="7" Margin="0,0,8,0">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                            <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                        <TextBlock
+                            MaxWidth="280"
+                            FontSize="10"
+                            Text="{Binding StatusMessage}"
+                            TextTrimming="CharacterEllipsis">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="1"
+                        Command="{Binding CopyCommand}"
+                        Content="Copiar"
+                        Style="{StaticResource BaseButtonStyle}" />
+                    <Button
+                        Grid.Column="3"
+                        Command="{Binding ExportCommand}"
+                        Content="Exportar .txt"
+                        Style="{StaticResource PrimaryButtonStyle}" />
+                </Grid>
+
+                <Grid Grid.Row="3" Margin="16,0,16,4">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="9"
+                        Foreground="{StaticResource SubtleTextBrush}"
+                        Text="Ctrl + Enter gerar  •  Ctrl + S exportar  •  Ctrl + Shift + C copiar" />
+                    <Button
+                        HorizontalAlignment="Right"
+                        Command="{Binding OpenFolderCommand}"
+                        Content="Abrir pasta"
+                        FontSize="9"
+                        Style="{StaticResource TextButtonStyle}" />
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

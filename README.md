@@ -1,90 +1,166 @@
-![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python)
-![Tkinter](https://img.shields.io/badge/Interface-Tkinter-green?style=for-the-badge)
+<div align="center">
 
-## Sobre o Projeto
+# Gerador de Scripts OLT ZTE
 
-Ferramenta desktop com interface gráfica (GUI) desenvolvida em Python para automatizar a geração de scripts de provisionamento em massa para **OLTs ZTE Titan**.
+### Provisionamento de rede com menos trabalho manual e mais segurança
 
-O projeto foi criado para atender demandas reais de **NOC (Network Operations Center)**, solucionando gargalos em cenários de:
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![WPF](https://img.shields.io/badge/Interface-WPF-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://learn.microsoft.com/dotnet/desktop/wpf/)
+[![MVVM](https://img.shields.io/badge/Arquitetura-MVVM-111827?style=for-the-badge)](#arquitetura)
+[![Build](https://img.shields.io/github/actions/workflow/status/rafaelcairess/Gerador-Script-OLT-ZTE/qualidade.yml?branch=main&style=for-the-badge&label=Build)](https://github.com/rafaelcairess/Gerador-Script-OLT-ZTE/actions/workflows/qualidade.yml)
+[![Licença](https://img.shields.io/badge/Licença-MIT-22C55E?style=for-the-badge)](LICENSE)
 
-- Migração de clientes entre OLTs
-- Ativação de novas portas PON
-- Janelas de manutenção com tempo crítico
+Aplicação desktop nativa para gerar, validar e exportar scripts de
+provisionamento de OLTs ZTE Titan.
 
-O objetivo principal é **reduzir erros manuais**, aumentar a velocidade operacional e minimizar o *downtime* durante manutenções.
+</div>
+
+![Tela principal do Gerador de Scripts OLT ZTE](documentacao/interface-gerador-olt.png)
+
+## O problema
+
+Ativações, migrações e manutenções de rede podem exigir centenas de comandos
+parecidos. Editar esses blocos manualmente consome tempo e aumenta a
+possibilidade de erros em intervalos de PON, ONUs, VLANs e identificadores.
+
+O Gerador de Scripts OLT ZTE transforma os parâmetros da operação em um script
+padronizado e pronto para revisão. Uma única configuração pode contemplar até
+**16 PONs e 2.048 ONUs**.
+
+## Principais recursos
+
+- Geração em lote por intervalos de PON e ONU
+- VLAN principal e serviço adicional para VoIP ou IPTV
+- Perfis TCONT e nomes GEM configuráveis
+- Validação imediata de intervalos, VLANs e identificadores
+- Pré-visualização do script com métricas da operação
+- Cabeçalho e rodapé personalizados
+- Perfis reutilizáveis em JSON
+- Compatibilidade com perfis criados em versões anteriores
+- Cópia para a área de transferência e exportação em `.txt`
+- Atalhos de teclado e interface escura, responsiva e minimalista
+- Executável único e autossuficiente para Windows x64
+
+## Destaques de engenharia
+
+Este projeto foi estruturado como uma aplicação de produção, não apenas como
+uma demonstração visual:
+
+- C# e .NET 8 com Nullable Reference Types
+- WPF com separação de responsabilidades usando MVVM
+- Princípios SOLID e inversão de dependência
+- Núcleo independente de interface, arquivos e APIs do Windows
+- Validações de domínio e mensagens de erro voltadas ao operador
+- Testes automatizados com xUnit e relatório de cobertura
+- Analisadores estáticos com avisos tratados como erros
+- Build, testes e publicação automatizados pelo GitHub Actions
+- Executável distribuído sem exigir instalação separada do .NET
+
+## Arquitetura
+
+A solução separa regras de negócio, integrações e interface gráfica em projetos
+independentes:
+
+| Projeto | Responsabilidade |
+|---|---|
+| `GeradorOlt.Nucleo` | Geração dos comandos, modelos, contratos e validações |
+| `GeradorOlt.Infraestrutura` | Persistência de perfis e exportação de arquivos |
+| `GeradorOlt.Apresentacao` | Interface WPF, estado da tela e integração com Windows |
+| `GeradorOlt.Testes` | Testes do núcleo, infraestrutura e apresentação |
+
+```text
+Interface WPF
+     │
+     ▼
+Modelos de visão
+     │
+     ▼
+Contratos do núcleo ◄──── Infraestrutura
+```
+
+O núcleo não conhece WPF, JSON ou detalhes do Windows. Isso permite testar as
+regras de geração isoladamente e trocar implementações externas sem alterar a
+lógica principal.
+
+Veja as decisões técnicas em
+[`documentacao/ARQUITETURA.md`](documentacao/ARQUITETURA.md).
+
+## Estrutura do projeto
+
+```text
+src/
+├── GeradorOlt.Nucleo/
+│   ├── Exportacao/
+│   ├── Geracao/
+│   ├── Modelos/
+│   ├── Perfis/
+│   └── Validacao/
+├── GeradorOlt.Infraestrutura/
+│   ├── Exportacao/
+│   └── Perfis/
+└── GeradorOlt.Apresentacao/
+    ├── Infraestrutura/
+    ├── ModelosVisao/
+    ├── Servicos/
+    ├── Telas/
+    └── Temas/
+testes/
+└── GeradorOlt.Testes/
+```
+
+## Como executar
+
+### Pelo Visual Studio
+
+1. Abra [`GeradorScriptsOltZte.sln`](GeradorScriptsOltZte.sln).
+2. Defina `GeradorOlt.Apresentacao` como projeto de inicialização.
+3. Pressione `F5`.
+
+### Pelo terminal
+
+Requer Windows e
+[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
+
+```powershell
+git clone https://github.com/rafaelcairess/Gerador-Script-OLT-ZTE.git
+cd Gerador-Script-OLT-ZTE
+dotnet run --project .\src\GeradorOlt.Apresentacao
+```
+
+## Testes e qualidade
+
+```powershell
+dotnet build GeradorScriptsOltZte.sln --configuration Release
+dotnet test GeradorScriptsOltZte.sln --configuration Release
+```
+
+Os testes cobrem geração por intervalos, segundo serviço, métricas,
+normalização de identificadores, entradas inválidas, compatibilidade JSON,
+exportação UTF-8 e comportamento dos modelos de visão.
+
+Integrações como área de transferência e caixas de diálogo são representadas
+por implementações controladas durante os testes. Assim, a lógica da interface
+pode ser verificada automaticamente sem abrir janelas ou alterar dados do
+computador.
+
+## Gerar o executável
+
+```powershell
+dotnet publish .\src\GeradorOlt.Apresentacao `
+  --configuration Release `
+  --runtime win-x64 `
+  --self-contained true `
+  -p:PublishSingleFile=true `
+  -p:IncludeNativeLibrariesForSelfExtract=true `
+  --output .\publicacao
+```
+
+O arquivo `publicacao\GeradorOlt-ZTE.exe` pode ser executado diretamente em
+Windows x64.
+
+> Scripts de rede devem ser revisados e validados em ambiente controlado antes
+> da aplicação em produção.
 
 ---
 
-## Evolução: Do .BAT ao Python
-
-Inicialmente, o processo de migração era realizado através da edição manual de arquivos em lote (`.bat`). Esse método se mostrava lento e altamente propenso a erros de digitação.
-
-### Vantagens desta versão em Python:
-
-- **Eficiência:** Geração instantânea de scripts complexos
-- **Confiabilidade:** Redução drástica de erros humanos durante a configuração
-- **Escalabilidade:** Código modular, preparado para novas regras de negócio e melhorias futuras
-
----
-
-## Funcionalidades
-
-### Configuração da OLT
-- **Slot e Card configuráveis** — não mais fixos; adapta-se a qualquer topologia de chassis
-- **Range de PONs** — define PON Inicial e PON Final para gerar script de múltiplas PONs de uma vez
-- **Range de ONUs** — define ONU Inicial e ONU Final (não necessariamente sempre 1–128)
-
-### Configuração de Serviço
-- **VLAN Principal** configurável
-- **Perfil TCONT** selecionável via dropdown: `100M`, `200M`, `500M`, `1G`, `2G`, `1GPON`
-- **Prefixo de nome/descrição** personalizável — cada ONU recebe `prefixo_PON_ONU` automaticamente
-- **Serviço Adicional (VoIP / IPTV)** — habilita gemport 2 com VLAN separada para um segundo serviço por ONU
-
-### Interface e Usabilidade
-- **Preview do script** — aba dedicada com scroll horizontal e vertical para visualizar antes de salvar
-- **Copiar para Clipboard** — copia o script completo com um clique
-- **Salvar Arquivo** — filedialog com nome sugerido automático (`script_ponX-Y_vlanZ.txt`)
-- **Salvar / Carregar Perfil** — persiste todas as configurações em JSON para reutilização
-- **Auto-carregamento** — ao abrir o programa, carrega `perfil_config.json` automaticamente se existir
-- **Abrir Pasta** — abre a pasta do último arquivo salvo
-- **Resumo pós-geração** — exibe o total de ONUs configuradas após gerar o script
-
-### Compatibilidade
-- **Multiplataforma** — abre pasta corretamente no Windows, macOS e Linux
-- **Portabilidade** — compilável em `.exe` via PyInstaller para uso sem instalação de Python
-
----
-
-## Tecnologias Utilizadas
-
-- [Python 3](https://www.python.org/) — Linguagem principal
-- [Tkinter](https://docs.python.org/3/library/tkinter.html) — Interface gráfica
-- [PyInstaller](https://pyinstaller.org/) — Compilação para executável standalone
-
----
-
-## Como Usar
-
-### Para o Usuário Final (Executável)
-
-1. Execute o arquivo `Gerador OLT.exe`
-2. Na aba **Configuração**, preencha:
-   - Slot, Card, PON Inicial e PON Final
-   - VLAN Principal e Perfil TCONT
-   - ONU Inicial e ONU Final
-   - Prefixo de nome (opcional)
-3. Se necessário, habilite o **Serviço Adicional** e informe a VLAN 2
-4. Clique em **GERAR SCRIPT**
-5. Visualize o resultado na aba **Script Gerado**
-6. Use **Copiar para Clipboard** ou **Salvar Arquivo** para exportar
-7. Cole o conteúdo no terminal da OLT ZTE Titan
-
-### Perfis de Configuração
-
-- Clique em **Salvar Perfil** para guardar as configurações atuais em um arquivo `.json`
-- Clique em **Carregar Perfil** para restaurar uma configuração salva anteriormente
-- O arquivo `perfil_config.json` na mesma pasta do executável é carregado automaticamente na abertura
-
----
-
-*By Rafael Caires & Lucas Alexandre*
+Desenvolvido por **Rafael Caires & Lucas Alexandre**.

@@ -1,0 +1,44 @@
+name: Build e Testes
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restaurar dependências
+        run: dotnet restore GeradorScriptsOltZte.sln
+
+      - name: Compilar
+        run: dotnet build GeradorScriptsOltZte.sln --configuration Release --no-restore
+
+      - name: Executar testes com cobertura
+        run: >
+          dotnet test GeradorScriptsOltZte.sln
+          --configuration Release
+          --no-build
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults
+
+      - name: Publicar relatório de cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-de-testes
+          path: TestResults/**/coverage.cobertura.xml

@@ -1,12 +1,14 @@
-# Ignorar pastas de build do PyInstaller
-build/
-dist/
-*.spec
-
-# Ignorar cache do Python
-__pycache__/
-*.pyc
+# Build do .NET
+bin/
+obj/
+publicacao/
+TestResults*/
+.vs/
+*.user
 
 # Ignorar arquivos de sistema
 .DS_Store
 Thumbs.db
+
+# Configuração local do usuário
+perfil_config.json
