@@ -9,7 +9,7 @@ public static partial class ValidadorConfiguracao
     public const int MaxCard = 99;
     public const int MaxPon = 16;
     public const int MaxOnu = 128;
-    public const int MaxVlan = 4096;
+    public const int MaxVlan = 4094;
 
     public static readonly IReadOnlyList<string> TcontProfiles =
         ["100M", "200M", "500M", "1G", "2G", "1GPON"];

@@ -118,8 +118,10 @@ testes/
 
 ### Pelo terminal
 
-Requer Windows e
-[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
+Requer Windows e o
+[.NET SDK 8.0.420](https://dotnet.microsoft.com/download/dotnet/8.0), versão
+fixada em [`global.json`](global.json) para manter builds locais e de CI
+reproduzíveis.
 
 ```powershell
 git clone https://github.com/rafaelcairess/Gerador-Script-OLT-ZTE.git

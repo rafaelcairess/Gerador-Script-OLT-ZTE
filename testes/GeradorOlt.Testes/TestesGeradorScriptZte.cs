@@ -81,6 +81,72 @@ public sealed class TestesGeradorScriptZte
     }
 
     [Fact]
+    public void Generate_AcceptsHighestUsableVlan()
+    {
+        var result = _generator.Generate(CreateConfiguration(vlan: 4094));
+
+        Assert.Contains("service-port 1 user-vlan 4094 vlan 4094", result.Content);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(4095)]
+    [InlineData(4096)]
+    public void Generate_RejectsReservedOrOutOfRangePrimaryVlan(int vlan)
+    {
+        var exception = Assert.Throws<ExcecaoValidacaoConfiguracao>(
+            () => _generator.Generate(CreateConfiguration(vlan: vlan)));
+
+        Assert.Contains("VLAN principal", exception.Message);
+        Assert.Contains("1 e 4094", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(4095)]
+    [InlineData(4096)]
+    public void Generate_RejectsReservedOrOutOfRangeSecondaryVlan(int secondaryVlan)
+    {
+        var exception = Assert.Throws<ExcecaoValidacaoConfiguracao>(
+            () => _generator.Generate(CreateConfiguration(secondaryVlan: secondaryVlan)));
+
+        Assert.Contains("VLAN do serviço adicional", exception.Message);
+        Assert.Contains("1 e 4094", exception.Message);
+    }
+
+    [Fact]
+    public void Generate_MatchesExpectedCompleteScript()
+    {
+        var expectedPath = Path.Combine(
+            AppContext.BaseDirectory,
+            "ArquivosEsperados",
+            "script-basico.txt");
+        var expected = File.ReadAllText(expectedPath).ReplaceLineEndings("\n");
+
+        var result = _generator.Generate(CreateConfiguration());
+        var actual = result.Content.ReplaceLineEndings("\n");
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Generate_SupportsMaximumPonAndOnuBatch()
+    {
+        var configuration = CreateConfiguration(
+            ponStart: 1,
+            ponEnd: ValidadorConfiguracao.MaxPon,
+            onuStart: 1,
+            onuEnd: ValidadorConfiguracao.MaxOnu);
+
+        var result = _generator.Generate(configuration);
+
+        Assert.Equal(16, result.Summary.TotalPons);
+        Assert.Equal(2048, result.Summary.TotalOnus);
+        Assert.Equal(2048, result.Summary.TotalServices);
+        Assert.Equal(2048, CountOccurrences(result.Content, "! Configuracao ONU"));
+        Assert.Contains("interface gpon_onu-1/2/16:128", result.Content);
+    }
+
+    [Fact]
     public void Generate_RejectsCommandInjectionInIdentifier()
     {
         var configuration = CreateConfiguration(gemName1: "GEM1 exit");

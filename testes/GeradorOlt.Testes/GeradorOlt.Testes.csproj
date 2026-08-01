@@ -23,4 +23,8 @@
     <ProjectReference Include="..\..\src\GeradorOlt.Apresentacao\GeradorOlt.Apresentacao.csproj" />
     <ProjectReference Include="..\..\src\GeradorOlt.Infraestrutura\GeradorOlt.Infraestrutura.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ArquivosEsperados\*.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

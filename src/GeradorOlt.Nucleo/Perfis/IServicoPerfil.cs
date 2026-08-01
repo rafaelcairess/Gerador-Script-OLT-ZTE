@@ -4,6 +4,6 @@ namespace GeradorOlt.Nucleo.Perfis;
 
 public interface IServicoPerfil
 {
-    void Save(string path, DadosPerfil profile);
-    DadosPerfil Load(string path);
+    public void Save(string path, DadosPerfil profile);
+    public DadosPerfil Load(string path);
 }
