@@ -133,7 +133,7 @@ jobs:
             Set-Content publicacao/GeradorOlt-ZTE.exe.sha256 -Encoding ascii
 
       - name: Criar release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.versao.outputs.tag }}
           name: "Gerador de Scripts OLT ZTE ${{ steps.versao.outputs.tag }}"
