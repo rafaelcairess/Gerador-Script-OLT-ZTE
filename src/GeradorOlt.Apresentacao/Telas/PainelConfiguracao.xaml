@@ -5,194 +5,153 @@
     <Border Style="{StaticResource CardStyle}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="74" />
+                <RowDefinition Height="64" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="72" />
+                <RowDefinition Height="62" />
             </Grid.RowDefinitions>
 
-            <Border
-                Padding="22,0"
-                BorderBrush="{StaticResource BorderBrush}"
-                BorderThickness="0,0,0,1">
+            <Border Padding="20,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
                 <Grid>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock FontSize="16" FontWeight="SemiBold" Text="Configuração" />
+                        <TextBlock FontSize="17" FontWeight="SemiBold" Text="CONFIGURAÇÃO" />
                         <TextBlock
                             Margin="0,3,0,0"
-                            FontSize="10"
+                            FontSize="12"
                             Foreground="{StaticResource MutedTextBrush}"
-                            Text="Preencha os dados da operação" />
+                            Text="Os comandos são validados enquanto você digita." />
                     </StackPanel>
-                    <Border
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Padding="9,5"
-                        Background="{StaticResource AccentSoftBrush}"
-                        CornerRadius="12">
-                        <TextBlock
-                            FontSize="9"
-                            FontWeight="SemiBold"
-                            Foreground="{StaticResource AccentTextBrush}"
-                            Text="PREVIEW AO VIVO" />
-                    </Border>
                 </Grid>
             </Border>
 
             <ScrollViewer
                 Grid.Row="1"
-                Padding="22,20,14,20"
+                Padding="20,20,12,20"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="0,0,8,0">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Border
-                                Width="24"
-                                Height="24"
-                                Margin="0,0,9,0"
-                                Background="{StaticResource AccentSoftBrush}"
-                                CornerRadius="7">
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    FontSize="9"
-                                    FontWeight="Bold"
-                                    Foreground="{StaticResource AccentTextBrush}"
-                                    Text="01" />
-                            </Border>
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Style="{StaticResource SectionTitleStyle}"
-                                Text="Localização da OLT" />
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="{StaticResource AccentBrush}" CornerRadius="1" />
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Style="{StaticResource SectionTitleStyle}" Text="01  LOCALIZAÇÃO DA OLT" />
+                            <TextBlock Margin="0,3,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="Chassis e intervalo de portas PON" />
                         </StackPanel>
-                        <TextBlock
-                            Margin="33,3,0,16"
-                            FontSize="10"
-                            Foreground="{StaticResource MutedTextBrush}"
-                            Text="Chassis e intervalo de portas PON." />
+                    </Grid>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="12" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="14" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Slot" />
-                                <TextBox Text="{Binding Configuration.Slot, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Card" />
-                                <TextBox Text="{Binding Configuration.Card, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="2">
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="PON inicial" />
-                                <TextBox Text="{Binding Configuration.PonStart, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="2" Grid.Column="2">
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="PON final" />
-                                <TextBox Text="{Binding Configuration.PonEnd, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-
-                    <Border Height="1" Margin="0,22" Background="{StaticResource BorderBrush}" />
-
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Border
-                                Width="24"
-                                Height="24"
-                                Margin="0,0,9,0"
-                                Background="{StaticResource AccentSoftBrush}"
-                                CornerRadius="7">
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    FontSize="9"
-                                    FontWeight="Bold"
-                                    Foreground="{StaticResource AccentTextBrush}"
-                                    Text="02" />
-                            </Border>
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Style="{StaticResource SectionTitleStyle}"
-                                Text="Serviço principal" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="14" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Slot" />
+                            <TextBox AutomationProperties.Name="Slot da OLT, valor de 1 a 99" InputScope="Number" MaxLength="2" Text="{Binding Configuration.Slot, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
                         </StackPanel>
-                        <TextBlock
-                            Margin="33,3,0,16"
-                            FontSize="10"
-                            Foreground="{StaticResource MutedTextBrush}"
-                            Text="VLAN, capacidade e identificação das ONUs." />
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Card" />
+                            <TextBox AutomationProperties.Name="Card da OLT, valor de 1 a 99" InputScope="Number" MaxLength="2" Text="{Binding Configuration.Card, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="2">
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="PON inicial" />
+                            <TextBox AutomationProperties.Name="PON inicial, valor de 1 a 16" InputScope="Number" MaxLength="2" Text="{Binding Configuration.PonStart, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.Column="2">
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="PON final" />
+                            <TextBox AutomationProperties.Name="PON final, valor de 1 a 16" InputScope="Number" MaxLength="2" Text="{Binding Configuration.PonEnd, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        </StackPanel>
+                    </Grid>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="12" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="14" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="14" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="VLAN principal" />
-                                <TextBox Text="{Binding Configuration.Vlan, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Perfil TCONT" />
-                                <ComboBox
-                                    ItemsSource="{Binding Configuration.TcontProfiles}"
-                                    SelectedItem="{Binding Configuration.SelectedTcontProfile}" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="2">
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="ONU inicial" />
-                                <TextBox Text="{Binding Configuration.OnuStart, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="2" Grid.Column="2">
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="ONU final" />
-                                <TextBox Text="{Binding Configuration.OnuEnd, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Grid.Row="4" Grid.ColumnSpan="3">
-                                <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Prefixo de identificação" />
-                                <TextBox Text="{Binding Configuration.Prefix, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
+                    <Border Height="1" Margin="0,24" Background="{StaticResource BorderBrush}" />
+
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="{StaticResource AccentBrush}" CornerRadius="1" />
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Style="{StaticResource SectionTitleStyle}" Text="02  SERVIÇO PRINCIPAL" />
+                            <TextBlock Margin="0,3,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="VLAN, capacidade e identificação das ONUs" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="14" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="14" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="VLAN principal" />
+                            <TextBox AutomationProperties.Name="VLAN principal, valor de 1 a 4094" InputScope="Number" MaxLength="4" Text="{Binding Configuration.Vlan, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Perfil TCONT" />
+                            <ComboBox AutomationProperties.Name="Perfil de capacidade TCONT" ItemsSource="{Binding Configuration.TcontProfiles}" SelectedItem="{Binding Configuration.SelectedTcontProfile}" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="2">
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="ONU inicial" />
+                            <TextBox AutomationProperties.Name="ONU inicial, valor de 1 a 128" InputScope="Number" MaxLength="3" Text="{Binding Configuration.OnuStart, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.Column="2">
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="ONU final" />
+                            <TextBox AutomationProperties.Name="ONU final, valor de 1 a 128" InputScope="Number" MaxLength="3" Text="{Binding Configuration.OnuEnd, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="4" Grid.ColumnSpan="3">
+                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Prefixo das ONUs" />
+                            <TextBox AutomationProperties.Name="Prefixo de identificação das ONUs" MaxLength="32" Text="{Binding Configuration.Prefix, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Grid>
 
                     <Border
-                        Margin="0,22,0,14"
+                        Margin="0,24,0,18"
                         Padding="14"
                         Background="{StaticResource SurfaceSoftBrush}"
                         BorderBrush="{StaticResource BorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10">
+                        CornerRadius="3">
                         <StackPanel>
                             <CheckBox
+                                AutomationProperties.Name="Adicionar segundo serviço de VoIP ou IPTV"
                                 Content="Adicionar segundo serviço (VoIP / IPTV)"
                                 FontWeight="SemiBold"
                                 IsChecked="{Binding Configuration.IsSecondaryServiceEnabled}" />
-                            <StackPanel Margin="0,13,0,0">
+                            <TextBlock
+                                Margin="24,4,0,14"
+                                FontSize="11"
+                                Foreground="{StaticResource MutedTextBrush}"
+                                Text="Habilite apenas quando a ONU precisar de uma segunda VLAN." />
+                            <StackPanel>
                                 <TextBlock Style="{StaticResource FieldLabelStyle}" Text="VLAN do segundo serviço" />
                                 <TextBox
+                                    AutomationProperties.Name="VLAN do segundo serviço, valor de 1 a 4094"
+                                    InputScope="Number"
                                     IsEnabled="{Binding Configuration.IsSecondaryServiceEnabled}"
-                                    Text="{Binding Configuration.SecondaryVlan, UpdateSourceTrigger=PropertyChanged}" />
+                                    MaxLength="4"
+                                    Text="{Binding Configuration.SecondaryVlan, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <Expander
-                        Padding="2,4"
-                        Foreground="{StaticResource TextBrush}"
-                        Header="Opções avançadas">
+                    <Expander Padding="2,4" Foreground="{StaticResource TextBrush}" Header="Opções avançadas">
                         <StackPanel Margin="0,14,0,4">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -202,38 +161,43 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Nome GEM 1" />
-                                    <TextBox Text="{Binding Configuration.GemName1, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox AutomationProperties.Name="Nome da GEM principal" MaxLength="32" Text="{Binding Configuration.GemName1, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Nome GEM 2" />
-                                    <TextBox Text="{Binding Configuration.GemName2, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox AutomationProperties.Name="Nome da GEM do segundo serviço" MaxLength="32" Text="{Binding Configuration.GemName2, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
                             </Grid>
                             <TextBlock Margin="0,14,0,6" Style="{StaticResource FieldLabelStyle}" Text="Comentário de cabeçalho" />
-                            <TextBox Text="{Binding Configuration.Header, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox AutomationProperties.Name="Comentário de cabeçalho do script" Text="{Binding Configuration.Header, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Margin="0,14,0,6" Style="{StaticResource FieldLabelStyle}" Text="Comentário de rodapé" />
-                            <TextBox Text="{Binding Configuration.Footer, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox AutomationProperties.Name="Comentário de rodapé do script" Text="{Binding Configuration.Footer, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </Expander>
                 </StackPanel>
             </ScrollViewer>
 
-            <Border
-                Grid.Row="2"
-                Padding="20,0"
-                BorderBrush="{StaticResource BorderBrush}"
-                BorderThickness="0,1,0,0">
+            <Border Grid.Row="2" Padding="12,0" Background="{StaticResource SurfaceSoftBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
                     <Button
+                        AutomationProperties.Name="Salvar configuração como perfil padrão"
                         HorizontalAlignment="Left"
-                        Command="{Binding SaveProfileCommand}"
-                        Content="Salvar perfil"
-                        Style="{StaticResource BaseButtonStyle}" />
-                    <Button
-                        HorizontalAlignment="Right"
-                        Command="{Binding GenerateCommand}"
-                        Content="Gerar script  →"
+                        Command="{Binding SaveDefaultProfileCommand}"
+                        Content="Salvar como padrão"
+                        ToolTip="Salvar no perfil carregado automaticamente ao abrir o aplicativo"
                         Style="{StaticResource PrimaryButtonStyle}" />
+                    <Button
+                        AutomationProperties.Name="Exportar perfil de configuração"
+                        Grid.Column="1"
+                        Margin="8,0,0,0"
+                        Command="{Binding SaveProfileCommand}"
+                        Content="Exportar perfil..."
+                        ToolTip="Salvar uma cópia JSON em outro local"
+                        Style="{StaticResource TextButtonStyle}" />
                 </Grid>
             </Border>
         </Grid>

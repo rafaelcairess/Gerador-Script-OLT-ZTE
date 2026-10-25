@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <RootNamespace>GeradorOlt.Apresentacao</RootNamespace>
     <AssemblyName>GeradorOlt-ZTE</AssemblyName>
     <ApplicationIcon>..\..\icone.ico</ApplicationIcon>

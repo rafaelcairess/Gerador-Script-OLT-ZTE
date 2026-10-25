@@ -5,6 +5,11 @@ namespace GeradorOlt.Infraestrutura.Perfis;
 
 internal sealed class DocumentoPerfil
 {
+    public const int CurrentVersion = 2;
+
+    [JsonPropertyName("versao")]
+    public int Version { get; init; } = 1;
+
     [JsonPropertyName("slot")]
     public string Slot { get; init; } = "1";
 
@@ -73,6 +78,7 @@ internal sealed class DocumentoPerfil
     public static DocumentoPerfil FromModel(DadosPerfil model) =>
         new()
         {
+            Version = CurrentVersion,
             Slot = model.Slot,
             Card = model.Card,
             PonStart = model.PonStart,

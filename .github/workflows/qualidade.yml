@@ -24,7 +24,7 @@ jobs:
           dotnet-version: "8.0.420"
 
       - name: Restaurar dependências
-        run: dotnet restore GeradorScriptsOltZte.sln
+        run: dotnet restore GeradorScriptsOltZte.sln --locked-mode
 
       - name: Compilar
         run: dotnet build GeradorScriptsOltZte.sln --configuration Release --no-restore
@@ -37,7 +37,33 @@ jobs:
           --collect:"XPlat Code Coverage"
           --results-directory TestResults
 
+      - name: Validar limites de cobertura
+        shell: pwsh
+        run: |
+          $coverageFile = Get-ChildItem TestResults -Recurse -Filter coverage.cobertura.xml |
+            Select-Object -First 1
+          if ($null -eq $coverageFile) {
+            throw "Relatório de cobertura não encontrado."
+          }
+
+          $coverage = [xml](Get-Content $coverageFile.FullName)
+          $lineCoverage = [double]::Parse(
+            $coverage.coverage.'line-rate',
+            [Globalization.CultureInfo]::InvariantCulture) * 100
+          $branchCoverage = [double]::Parse(
+            $coverage.coverage.'branch-rate',
+            [Globalization.CultureInfo]::InvariantCulture) * 100
+          Write-Host ("Cobertura: {0:N2}% de linhas; {1:N2}% de branches" -f $lineCoverage, $branchCoverage)
+
+          if ($lineCoverage -lt 70) {
+            throw "Cobertura de linhas abaixo do mínimo de 70%."
+          }
+          if ($branchCoverage -lt 65) {
+            throw "Cobertura de branches abaixo do mínimo de 65%."
+          }
+
       - name: Publicar relatório de cobertura
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cobertura-de-testes

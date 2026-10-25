@@ -4,119 +4,91 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="70" />
-            <RowDefinition Height="14" />
+            <RowDefinition Height="72" />
+            <RowDefinition Height="8" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <Border Style="{StaticResource CardStyle}">
+            <Grid Margin="18,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="1.2*" />
+                </Grid.ColumnDefinitions>
 
-            <Border Padding="14,10" Style="{StaticResource CardStyle}">
-                <StackPanel>
-                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="{Binding TotalPons}" />
-                    <TextBlock Margin="0,2,0,0" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Text="PONs" />
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock FontFamily="Consolas" FontSize="19" FontWeight="SemiBold" Text="{Binding TotalPons}" />
+                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="PORTAS PON" />
                 </StackPanel>
-            </Border>
-            <Border Grid.Column="2" Padding="14,10" Style="{StaticResource CardStyle}">
-                <StackPanel>
-                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="{Binding TotalOnus}" />
-                    <TextBlock Margin="0,2,0,0" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Text="ONUs" />
+                <Border Grid.Column="1" Height="32" Background="{StaticResource BorderBrush}" />
+                <StackPanel Grid.Column="2" Margin="18,0,0,0" VerticalAlignment="Center">
+                    <TextBlock FontFamily="Consolas" FontSize="19" FontWeight="SemiBold" Text="{Binding TotalOnus}" />
+                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="ONUs" />
                 </StackPanel>
-            </Border>
-            <Border Grid.Column="4" Padding="14,10" Style="{StaticResource CardStyle}">
-                <StackPanel>
-                    <TextBlock FontSize="19" FontWeight="SemiBold" Text="{Binding TotalServices}" />
-                    <TextBlock Margin="0,2,0,0" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Text="Serviços" />
+                <Border Grid.Column="3" Height="32" Background="{StaticResource BorderBrush}" />
+                <StackPanel Grid.Column="4" Margin="18,0,0,0" VerticalAlignment="Center">
+                    <TextBlock FontFamily="Consolas" FontSize="19" FontWeight="SemiBold" Text="{Binding TotalServices}" />
+                    <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="SERVIÇOS" />
                 </StackPanel>
-            </Border>
-            <Border Grid.Column="6" Padding="14,10" Style="{StaticResource CardStyle}">
-                <StackPanel>
-                    <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding TotalLines}" />
-                    <TextBlock Margin="0,5,0,0" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Text="Tamanho" />
+                <Border Grid.Column="5" Height="32" Background="{StaticResource BorderBrush}" />
+                <StackPanel Grid.Column="6" Margin="18,0,0,0" VerticalAlignment="Center">
+                    <TextBlock FontFamily="Consolas" FontSize="16" FontWeight="SemiBold" Text="{Binding TotalLines}" />
+                    <TextBlock Margin="0,3,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="SAÍDA GERADA" />
                 </StackPanel>
-            </Border>
-        </Grid>
+            </Grid>
+        </Border>
 
         <Border Grid.Row="2" Style="{StaticResource CardStyle}">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="58" />
+                    <RowDefinition Height="64" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="66" />
-                    <RowDefinition Height="42" />
+                    <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
 
-                <Border
-                    Padding="18,0"
-                    BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="0,0,0,1">
+                <Border Padding="16,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
                     <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock FontSize="13" FontWeight="SemiBold" Text="Preview do script" />
-                            <TextBlock
-                                Margin="0,2,0,0"
-                                FontSize="9"
-                                Foreground="{StaticResource MutedTextBrush}"
-                                Text="Revise os comandos antes de exportar" />
+                            <TextBlock FontSize="16" FontWeight="SemiBold" Text="SCRIPT GERADO" />
+                            <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="Revise os comandos antes de enviar para a OLT" />
                         </StackPanel>
 
-                        <Border
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Padding="9,5"
-                            CornerRadius="12">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="{StaticResource SuccessSoftBrush}" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding StatusIsError}" Value="True">
-                                            <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="6" Height="6" Margin="0,0,6,0">
-                                    <Ellipse.Style>
-                                        <Style TargetType="Ellipse">
-                                            <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding StatusIsError}" Value="True">
-                                                    <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Ellipse.Style>
-                                </Ellipse>
-                                <TextBlock FontSize="9" FontWeight="SemiBold">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
-                                            <Setter Property="Text" Value="VALIDADO" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding StatusIsError}" Value="True">
-                                                    <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
-                                                    <Setter Property="Text" Value="REVISAR" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </StackPanel>
-                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
+                            <CheckBox
+                                x:Name="WrapToggle"
+                                AutomationProperties.Name="Alternar quebra automática de linhas"
+                                Margin="0,0,12,0"
+                                Content="Quebrar linhas"
+                                ToolTip="Ajustar linhas longas à largura do preview" />
+                            <Button
+                                AutomationProperties.Name="Copiar script para a área de transferência"
+                                Command="{Binding CopyCommand}"
+                                Content="Copiar"
+                                ToolTip="Copiar script (Ctrl+Shift+C)"
+                                Style="{StaticResource BaseButtonStyle}" />
+                            <Button
+                                AutomationProperties.Name="Exportar script para arquivo de texto"
+                                Margin="8,0,0,0"
+                                Command="{Binding ExportCommand}"
+                                Content="Exportar .txt"
+                                ToolTip="Exportar script (Ctrl+S)"
+                                Style="{StaticResource PrimaryButtonStyle}" />
+                        </StackPanel>
                     </Grid>
                 </Border>
 
                 <TextBox
+                    AutomationProperties.Name="Pré-visualização dos comandos gerados"
                     Grid.Row="1"
                     Padding="18,15"
                     AcceptsReturn="True"
@@ -124,78 +96,79 @@
                     Background="{StaticResource CodeBackgroundBrush}"
                     BorderThickness="0"
                     FontFamily="Consolas"
-                    FontSize="11"
+                    FontSize="12"
                     Foreground="{StaticResource CodeTextBrush}"
                     HorizontalScrollBarVisibility="Auto"
                     IsReadOnly="True"
                     Text="{Binding ScriptPreview, Mode=OneWay}"
                     VerticalContentAlignment="Top"
-                    VerticalScrollBarVisibility="Auto" />
+                    VerticalScrollBarVisibility="Auto">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Setter Property="TextWrapping" Value="NoWrap" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsChecked, ElementName=WrapToggle}" Value="True">
+                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
 
-                <Grid Grid.Row="2" Margin="16,12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="8" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <Border Grid.Row="2" Padding="14,0" Background="{StaticResource SurfaceSoftBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+                    <Grid>
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" Margin="0,0,8,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                                <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock
+                                AutomationProperties.LiveSetting="Assertive"
+                                MaxWidth="420"
+                                VerticalAlignment="Center"
+                                FontSize="11"
+                                Text="{Binding StatusMessage}"
+                                TextTrimming="CharacterEllipsis">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding StatusIsError}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
 
-                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                        <Ellipse Width="7" Height="7" Margin="0,0,8,0">
-                            <Ellipse.Style>
-                                <Style TargetType="Ellipse">
-                                    <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding StatusIsError}" Value="True">
-                                            <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Ellipse.Style>
-                        </Ellipse>
-                        <TextBlock
-                            MaxWidth="280"
-                            FontSize="10"
-                            Text="{Binding StatusMessage}"
-                            TextTrimming="CharacterEllipsis">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding StatusIsError}" Value="True">
-                                            <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </StackPanel>
-
-                    <Button
-                        Grid.Column="1"
-                        Command="{Binding CopyCommand}"
-                        Content="Copiar"
-                        Style="{StaticResource BaseButtonStyle}" />
-                    <Button
-                        Grid.Column="3"
-                        Command="{Binding ExportCommand}"
-                        Content="Exportar .txt"
-                        Style="{StaticResource PrimaryButtonStyle}" />
-                </Grid>
-
-                <Grid Grid.Row="3" Margin="16,0,16,4">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontSize="9"
-                        Foreground="{StaticResource SubtleTextBrush}"
-                        Text="Ctrl + Enter gerar  •  Ctrl + S exportar  •  Ctrl + Shift + C copiar" />
-                    <Button
-                        HorizontalAlignment="Right"
-                        Command="{Binding OpenFolderCommand}"
-                        Content="Abrir pasta"
-                        FontSize="9"
-                        Style="{StaticResource TextButtonStyle}" />
-                </Grid>
+                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock
+                                Margin="0,0,12,0"
+                                VerticalAlignment="Center"
+                                FontFamily="Consolas"
+                                FontSize="10"
+                                Foreground="{StaticResource SubtleTextBrush}"
+                                Text="CTRL+S EXPORTAR  ·  CTRL+SHIFT+C COPIAR" />
+                            <Button
+                                AutomationProperties.Name="Abrir pasta do último arquivo exportado"
+                                Command="{Binding OpenFolderCommand}"
+                                Content="Abrir pasta"
+                                FontSize="11"
+                                ToolTip="Disponível depois da primeira exportação"
+                                Style="{StaticResource TextButtonStyle}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
     </Grid>

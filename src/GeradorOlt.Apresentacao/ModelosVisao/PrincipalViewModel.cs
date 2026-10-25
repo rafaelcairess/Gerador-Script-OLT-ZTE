@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using GeradorOlt.Apresentacao.Infraestrutura;
 using GeradorOlt.Apresentacao.Servicos;
 using GeradorOlt.Nucleo.Exportacao;
@@ -16,9 +17,12 @@ public sealed class PrincipalViewModel : BaseViewModel
     private readonly IServicoExportacaoScript _scriptExportService;
     private readonly IServicoDialogos _dialogService;
     private readonly IServicoAreaTransferencia _clipboardService;
+    private readonly ICaminhosAplicacao _applicationPaths;
+    private readonly IAgendadorAtualizacao _previewScheduler;
     private readonly CultureInfo _culture = CultureInfo.GetCultureInfo("pt-BR");
+    private readonly string _applicationVersion = GetApplicationVersion();
 
-    private string _lastFolder = Environment.CurrentDirectory;
+    private string _lastFolder;
     private string _scriptPreview = string.Empty;
     private string _totalPons = "—";
     private string _totalOnus = "—";
@@ -27,34 +31,43 @@ public sealed class PrincipalViewModel : BaseViewModel
     private string _statusMessage = "Aguardando configuração";
     private bool _statusIsError;
     private bool _hasValidScript;
+    private bool _isDirty;
+    private bool _hasExportedFile;
 
     public PrincipalViewModel(
         IGeradorScript scriptGenerator,
         IServicoPerfil profileService,
         IServicoExportacaoScript scriptExportService,
         IServicoDialogos dialogService,
-        IServicoAreaTransferencia clipboardService)
+        IServicoAreaTransferencia clipboardService,
+        ICaminhosAplicacao applicationPaths,
+        IAgendadorAtualizacao previewScheduler)
     {
         _scriptGenerator = scriptGenerator;
         _profileService = profileService;
         _scriptExportService = scriptExportService;
         _dialogService = dialogService;
         _clipboardService = clipboardService;
+        _applicationPaths = applicationPaths;
+        _previewScheduler = previewScheduler;
+        _lastFolder = applicationPaths.InitialDirectory;
 
         Configuration = new ConfiguracaoViewModel();
-        Configuration.Changed += (_, _) => RefreshPreview();
+        Configuration.Changed += (_, _) => OnConfigurationChanged();
 
         GenerateCommand = new Comando(
-            () => RefreshPreview("Script validado e atualizado com sucesso."));
+            GenerateNow);
         CopyCommand = new Comando(CopyScript, () => HasValidScript);
         ExportCommand = new Comando(ExportScript, () => HasValidScript);
         SaveProfileCommand = new Comando(SaveProfile);
+        SaveDefaultProfileCommand = new Comando(SaveDefaultProfile);
         LoadProfileCommand = new Comando(LoadProfile);
         NewScenarioCommand = new Comando(NewScenario);
-        OpenFolderCommand = new Comando(OpenFolder);
+        OpenFolderCommand = new Comando(OpenFolder, () => HasExportedFile);
         AboutCommand = new Comando(ShowAbout);
 
         RefreshPreview();
+        IsDirty = false;
         TryLoadDefaultProfile();
     }
 
@@ -64,10 +77,25 @@ public sealed class PrincipalViewModel : BaseViewModel
     public Comando CopyCommand { get; }
     public Comando ExportCommand { get; }
     public Comando SaveProfileCommand { get; }
+    public Comando SaveDefaultProfileCommand { get; }
     public Comando LoadProfileCommand { get; }
     public Comando NewScenarioCommand { get; }
     public Comando OpenFolderCommand { get; }
     public Comando AboutCommand { get; }
+
+    public string ApplicationVersion => _applicationVersion;
+
+    public bool HasExportedFile
+    {
+        get => _hasExportedFile;
+        private set
+        {
+            if (SetProperty(ref _hasExportedFile, value))
+            {
+                OpenFolderCommand.RaiseCanExecuteChanged();
+            }
+        }
+    }
 
     public string ScriptPreview
     {
@@ -124,6 +152,26 @@ public sealed class PrincipalViewModel : BaseViewModel
         }
     }
 
+    public bool IsDirty
+    {
+        get => _isDirty;
+        private set => SetProperty(ref _isDirty, value);
+    }
+
+    private void OnConfigurationChanged()
+    {
+        IsDirty = true;
+        HasValidScript = false;
+        SetStatus("Atualizando validação…", isError: false);
+        _previewScheduler.Schedule(() => RefreshPreview());
+    }
+
+    private void GenerateNow()
+    {
+        _previewScheduler.Cancel();
+        RefreshPreview("Script validado localmente e atualizado com sucesso.");
+    }
+
     private void RefreshPreview(string? successMessage = null)
     {
         try
@@ -164,7 +212,7 @@ public sealed class PrincipalViewModel : BaseViewModel
         }
         catch (Exception exception)
         {
-            _dialogService.ShowError("Não foi possível copiar", exception.Message);
+            ReportError("Não foi possível copiar", exception);
         }
     }
 
@@ -173,7 +221,7 @@ public sealed class PrincipalViewModel : BaseViewModel
         var fileName =
             $"script_pon{Configuration.PonStart}-{Configuration.PonEnd}"
             + $"_vlan{Configuration.Vlan}.txt";
-        var path = _dialogService.SelectScriptToSave(fileName);
+        var path = _dialogService.SelectScriptToSave(fileName, _lastFolder);
         if (path is null)
         {
             return;
@@ -183,17 +231,18 @@ public sealed class PrincipalViewModel : BaseViewModel
         {
             _scriptExportService.Export(path, ScriptPreview);
             UpdateLastFolder(path);
+            HasExportedFile = true;
             SetStatus($"Arquivo {Path.GetFileName(path)} exportado.", isError: false);
         }
         catch (Exception exception) when (IsFileException(exception))
         {
-            _dialogService.ShowError("Não foi possível exportar", exception.Message);
+            ReportError("Não foi possível exportar", exception);
         }
     }
 
     private void SaveProfile()
     {
-        var path = _dialogService.SelectProfileToSave();
+        var path = _dialogService.SelectProfileToSave(_lastFolder);
         if (path is null)
         {
             return;
@@ -203,17 +252,34 @@ public sealed class PrincipalViewModel : BaseViewModel
         {
             _profileService.Save(path, Configuration.ToProfile());
             UpdateLastFolder(path);
-            SetStatus($"Perfil {Path.GetFileName(path)} salvo.", isError: false);
+            IsDirty = false;
+            SetStatus($"Perfil {Path.GetFileName(path)} exportado.", isError: false);
         }
         catch (Exception exception) when (IsFileException(exception))
         {
-            _dialogService.ShowError("Não foi possível salvar o perfil", exception.Message);
+            ReportError("Não foi possível salvar o perfil", exception);
+        }
+    }
+
+    private void SaveDefaultProfile()
+    {
+        var path = _applicationPaths.DefaultProfilePath;
+
+        try
+        {
+            _profileService.Save(path, Configuration.ToProfile());
+            IsDirty = false;
+            SetStatus("Perfil padrão salvo. Ele será carregado na próxima abertura.", isError: false);
+        }
+        catch (Exception exception) when (IsFileException(exception))
+        {
+            ReportError("Não foi possível salvar o perfil padrão", exception);
         }
     }
 
     private void LoadProfile()
     {
-        var path = _dialogService.SelectProfileToOpen();
+        var path = _dialogService.SelectProfileToOpen(_lastFolder);
         if (path is null)
         {
             return;
@@ -222,19 +288,27 @@ public sealed class PrincipalViewModel : BaseViewModel
         try
         {
             Configuration.Apply(_profileService.Load(path));
+            _previewScheduler.Cancel();
+            RefreshPreview();
             UpdateLastFolder(path);
-            SetStatus($"Perfil {Path.GetFileName(path)} carregado.", isError: false);
+            CompleteProfileLoad(Path.GetFileName(path));
         }
         catch (Exception exception) when (IsFileException(exception))
         {
-            _dialogService.ShowError("Não foi possível carregar o perfil", exception.Message);
+            ReportError("Não foi possível carregar o perfil", exception);
         }
     }
 
     private void TryLoadDefaultProfile()
     {
-        var path = Path.Combine(Environment.CurrentDirectory, "perfil_config.json");
-        if (!File.Exists(path))
+        var path = new[]
+            {
+                _applicationPaths.DefaultProfilePath,
+                _applicationPaths.LegacyDefaultProfilePath
+            }
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault(File.Exists);
+        if (path is null)
         {
             return;
         }
@@ -242,6 +316,10 @@ public sealed class PrincipalViewModel : BaseViewModel
         try
         {
             Configuration.Apply(_profileService.Load(path));
+            _previewScheduler.Cancel();
+            RefreshPreview();
+            UpdateLastFolder(path);
+            CompleteProfileLoad(Path.GetFileName(path));
         }
         catch (Exception exception) when (IsFileException(exception))
         {
@@ -251,7 +329,15 @@ public sealed class PrincipalViewModel : BaseViewModel
 
     private void NewScenario()
     {
+        if (!ConfirmDiscardChanges())
+        {
+            return;
+        }
+
         Configuration.Reset();
+        _previewScheduler.Cancel();
+        RefreshPreview();
+        IsDirty = false;
         SetStatus("Novo cenário iniciado.", isError: false);
     }
 
@@ -265,14 +351,14 @@ public sealed class PrincipalViewModel : BaseViewModel
             when (exception is InvalidOperationException
                 or System.ComponentModel.Win32Exception)
         {
-            _dialogService.ShowError("Não foi possível abrir a pasta", exception.Message);
+            ReportError("Não foi possível abrir a pasta", exception);
         }
     }
 
     private void ShowAbout() =>
         _dialogService.ShowInformation(
             "Sobre o Gerador OLT ZTE",
-            "Gerador de Scripts OLT ZTE • versão 2.0"
+            $"Gerador de Scripts OLT ZTE • versão {GetApplicationVersion()}"
             + Environment.NewLine + Environment.NewLine
             + "Automação de provisionamento para OLTs ZTE Titan."
             + Environment.NewLine
@@ -280,15 +366,55 @@ public sealed class PrincipalViewModel : BaseViewModel
             + Environment.NewLine + Environment.NewLine
             + "Rafael Caires & Lucas Alexandre");
 
+    private static string GetApplicationVersion()
+    {
+        var informationalVersion = Assembly.GetEntryAssembly()?
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion;
+        return informationalVersion?.Split('+')[0] ?? "desconhecida";
+    }
+
     private string FormatNumber(int number) => number.ToString("N0", _culture);
 
-    private void UpdateLastFolder(string path) =>
-        _lastFolder = Path.GetDirectoryName(path) ?? Environment.CurrentDirectory;
+    public bool ConfirmClose() => ConfirmDiscardChanges();
+
+    private bool ConfirmDiscardChanges() =>
+        !IsDirty || _dialogService.Confirm(
+            "Descartar alterações?",
+            "As alterações do cenário atual ainda não foram salvas. Deseja descartá-las?");
+
+    private void UpdateLastFolder(string path)
+    {
+        var directory = Path.GetDirectoryName(path);
+        _lastFolder = !string.IsNullOrWhiteSpace(directory) && Directory.Exists(directory)
+            ? directory
+            : _applicationPaths.InitialDirectory;
+    }
+
+    private void CompleteProfileLoad(string fileName)
+    {
+        IsDirty = false;
+        if (HasValidScript)
+        {
+            SetStatus($"Perfil {fileName} carregado.", isError: false);
+            return;
+        }
+
+        SetStatus(
+            $"Perfil {fileName} carregado, mas contém erros: {StatusMessage}",
+            isError: true);
+    }
 
     private void SetStatus(string message, bool isError)
     {
         StatusMessage = message;
         StatusIsError = isError;
+    }
+
+    private void ReportError(string title, Exception exception)
+    {
+        SetStatus($"{title}: {exception.Message}", isError: true);
+        _dialogService.ShowError(title, exception.Message);
     }
 
     private static bool IsFileException(Exception exception) =>

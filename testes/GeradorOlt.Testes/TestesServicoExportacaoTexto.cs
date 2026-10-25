@@ -24,6 +24,18 @@ public sealed class TestesServicoExportacaoTexto : IDisposable
         Assert.Equal(content, Encoding.UTF8.GetString(bytes));
     }
 
+    [Fact]
+    public void Export_AtomicallyOverwritesExistingScript()
+    {
+        var path = Path.Combine(_directory, "script.txt");
+        File.WriteAllText(path, "conteúdo anterior");
+
+        new ServicoExportacaoTexto().Export(path, "conteúdo novo");
+
+        Assert.Equal("conteúdo novo", File.ReadAllText(path));
+        Assert.Empty(Directory.GetFiles(_directory, "*.tmp"));
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_directory))

@@ -1,12 +1,16 @@
+using System.Collections;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using GeradorOlt.Apresentacao.Infraestrutura;
 using GeradorOlt.Nucleo.Modelos;
 using GeradorOlt.Nucleo.Validacao;
 
 namespace GeradorOlt.Apresentacao.ModelosVisao;
 
-public sealed class ConfiguracaoViewModel : BaseViewModel
+public sealed class ConfiguracaoViewModel : BaseViewModel, INotifyDataErrorInfo
 {
+    private readonly Dictionary<string, string> _errors = [];
     private bool _suspendNotifications;
     private string _slot = "1";
     private string _card = "3";
@@ -25,6 +29,9 @@ public sealed class ConfiguracaoViewModel : BaseViewModel
     private string _secondaryVlan = string.Empty;
 
     public event EventHandler? Changed;
+    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+
+    public bool HasErrors => _errors.Count > 0;
 
     [SuppressMessage(
         "Performance",
@@ -117,6 +124,12 @@ public sealed class ConfiguracaoViewModel : BaseViewModel
         {
             if (SetProperty(ref _isSecondaryServiceEnabled, value))
             {
+                ValidateNumericField(
+                    nameof(SecondaryVlan),
+                    SecondaryVlan,
+                    1,
+                    ValidadorConfiguracao.MaxVlan,
+                    required: value);
                 NotifyChanged();
             }
         }
@@ -203,11 +216,113 @@ public sealed class ConfiguracaoViewModel : BaseViewModel
 
     public void Reset() => Apply(new DadosPerfil());
 
-    private void SetInput(ref string field, string? value)
+    public IEnumerable GetErrors(string? propertyName)
     {
-        if (SetProperty(ref field, value ?? string.Empty))
+        if (string.IsNullOrEmpty(propertyName))
         {
+            return _errors.Values;
+        }
+
+        return _errors.TryGetValue(propertyName, out var error)
+            ? new[] { error }
+            : Array.Empty<string>();
+    }
+
+    private void SetInput(
+        ref string field,
+        string? value,
+        [CallerMemberName] string propertyName = "")
+    {
+        var normalizedValue = value ?? string.Empty;
+        if (SetProperty(ref field, normalizedValue, propertyName))
+        {
+            ValidateInput(propertyName, normalizedValue);
             NotifyChanged();
+        }
+    }
+
+    private void ValidateInput(string propertyName, string value)
+    {
+        switch (propertyName)
+        {
+            case nameof(Slot):
+                ValidateNumericField(propertyName, value, 1, ValidadorConfiguracao.MaxSlot);
+                break;
+            case nameof(Card):
+                ValidateNumericField(propertyName, value, 1, ValidadorConfiguracao.MaxCard);
+                break;
+            case nameof(PonStart):
+            case nameof(PonEnd):
+                ValidateNumericField(propertyName, value, 1, ValidadorConfiguracao.MaxPon);
+                break;
+            case nameof(Vlan):
+                ValidateNumericField(propertyName, value, 1, ValidadorConfiguracao.MaxVlan);
+                break;
+            case nameof(OnuStart):
+            case nameof(OnuEnd):
+                ValidateNumericField(propertyName, value, 1, ValidadorConfiguracao.MaxOnu);
+                break;
+            case nameof(SecondaryVlan):
+                ValidateNumericField(
+                    propertyName,
+                    value,
+                    1,
+                    ValidadorConfiguracao.MaxVlan,
+                    required: IsSecondaryServiceEnabled);
+                break;
+        }
+    }
+
+    private void ValidateNumericField(
+        string propertyName,
+        string value,
+        int minimum,
+        int maximum,
+        bool required = true)
+    {
+        string? error = null;
+        if (!required)
+        {
+            error = null;
+        }
+        else if (string.IsNullOrWhiteSpace(value))
+        {
+            error = "Campo obrigatório.";
+        }
+        else if (!int.TryParse(value.Trim(), out var parsed))
+        {
+            error = "Informe um número inteiro.";
+        }
+        else if (parsed < minimum || parsed > maximum)
+        {
+            error = $"Use um valor entre {minimum} e {maximum}.";
+        }
+
+        SetError(propertyName, error);
+    }
+
+    private void SetError(string propertyName, string? error)
+    {
+        bool changed;
+        if (error is null)
+        {
+            changed = _errors.Remove(propertyName);
+        }
+        else if (!_errors.TryGetValue(propertyName, out var current)
+            || !string.Equals(current, error, StringComparison.Ordinal))
+        {
+            _errors[propertyName] = error;
+            changed = true;
+        }
+        else
+        {
+            changed = false;
+        }
+
+        if (changed)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            OnPropertyChanged(nameof(HasErrors));
         }
     }
 

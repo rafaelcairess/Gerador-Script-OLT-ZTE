@@ -3,15 +3,25 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:views="clr-namespace:GeradorOlt.Apresentacao.Telas"
-    Title="Gerador de Scripts OLT ZTE"
-    Width="1220"
-    Height="780"
-    MinWidth="1040"
-    MinHeight="680"
+    Width="1240"
+    Height="800"
+    MinWidth="960"
+    MinHeight="660"
     Background="{StaticResource BackgroundBrush}"
     Foreground="{StaticResource TextBrush}"
     Icon="Assets/icone.ico"
     WindowStartupLocation="CenterScreen">
+
+    <Window.Style>
+        <Style TargetType="Window">
+            <Setter Property="Title" Value="OLT Script Console" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDirty}" Value="True">
+                    <Setter Property="Title" Value="OLT Script Console — alterações não salvas" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
 
     <Window.InputBindings>
         <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding GenerateCommand}" />
@@ -21,7 +31,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="76" />
+            <RowDefinition Height="64" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -29,85 +39,82 @@
             Background="{StaticResource SurfaceBrush}"
             BorderBrush="{StaticResource BorderBrush}"
             BorderThickness="0,0,0,1">
-            <Grid Margin="28,0">
+            <Grid Margin="18,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                    <Border
-                        Width="40"
-                        Height="40"
-                        Background="{StaticResource AccentBrush}"
-                        CornerRadius="10">
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontSize="13"
-                            FontWeight="Bold"
-                            Foreground="White"
-                            Text="ZTE" />
-                    </Border>
-                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                        <TextBlock
-                            FontSize="16"
-                            FontWeight="SemiBold"
-                            Text="Gerador de Scripts OLT ZTE" />
+                    <StackPanel Margin="2,0,0,0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="16" FontWeight="SemiBold" Text="OLT SCRIPT CONSOLE" />
+                            <Border
+                                Margin="10,1,0,0"
+                                Padding="6,2"
+                                VerticalAlignment="Center"
+                                Background="{StaticResource SurfaceSoftBrush}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="2">
+                                <TextBlock
+                                    FontFamily="Consolas"
+                                    FontSize="10"
+                                    Foreground="{StaticResource MutedTextBrush}"
+                                    Text="{Binding ApplicationVersion, StringFormat=v{0}}" />
+                            </Border>
+                        </StackPanel>
                         <TextBlock
                             Margin="0,2,0,0"
-                            FontSize="10"
-                            Foreground="{StaticResource MutedTextBrush}"
-                            Text="Provisionamento rápido, seguro e padronizado" />
+                            FontFamily="Consolas"
+                            FontSize="11"
+                            Foreground="{StaticResource SubtleTextBrush}"
+                            Text="ZTE TITAN  /  PROVISIONAMENTO GPON" />
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
                     <Button
+                        AutomationProperties.Name="Iniciar nova configuração"
                         Command="{Binding NewScenarioCommand}"
-                        Content="Novo"
+                        Content="Nova configuração"
+                        ToolTip="Descartar o cenário atual e começar outro"
                         Style="{StaticResource TextButtonStyle}" />
                     <Button
+                        AutomationProperties.Name="Importar perfil de configuração"
                         Margin="4,0,0,0"
                         Command="{Binding LoadProfileCommand}"
-                        Content="Carregar perfil"
-                        Style="{StaticResource TextButtonStyle}" />
+                        Content="Importar perfil..."
+                        ToolTip="Abrir um perfil JSON existente"
+                        Style="{StaticResource BaseButtonStyle}" />
                     <Button
-                        Margin="4,0,14,0"
+                        AutomationProperties.Name="Abrir informações sobre o aplicativo"
+                        Margin="4,0,0,0"
                         Command="{Binding AboutCommand}"
                         Content="Sobre"
                         Style="{StaticResource TextButtonStyle}" />
-                    <Border
-                        Padding="10,7"
-                        Background="{StaticResource SuccessSoftBrush}"
-                        BorderBrush="{StaticResource SuccessBorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="16">
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse
-                                Width="7"
-                                Height="7"
-                                Margin="0,0,7,0"
-                                Fill="{StaticResource SuccessBrush}" />
-                            <TextBlock
-                                FontSize="10"
-                                FontWeight="SemiBold"
-                                Foreground="{StaticResource SuccessBrush}"
-                                Text="Pronto" />
-                        </StackPanel>
-                    </Border>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Grid Grid.Row="1" Margin="28,24,28,26">
+        <Grid Grid.Row="1" Margin="18">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="430" />
-                <ColumnDefinition Width="18" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="420" MinWidth="360" MaxWidth="520" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" MinWidth="480" />
             </Grid.ColumnDefinitions>
 
             <views:PainelConfiguracao Grid.Column="0" />
+            <GridSplitter
+                Grid.Column="1"
+                Width="8"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                Cursor="SizeWE"
+                ResizeBehavior="PreviousAndNext"
+                ResizeDirection="Columns"
+                ShowsPreview="True" />
             <views:PainelVisualizacaoScript Grid.Column="2" />
         </Grid>
     </Grid>

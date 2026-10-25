@@ -1,4 +1,5 @@
 using System.Text;
+using GeradorOlt.Infraestrutura.Arquivos;
 using GeradorOlt.Nucleo.Exportacao;
 
 namespace GeradorOlt.Infraestrutura.Exportacao;
@@ -11,6 +12,6 @@ public sealed class ServicoExportacaoTexto : IServicoExportacaoScript
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(content);
-        File.WriteAllText(path, content, Utf8WithoutBom);
+        EscritorArquivoAtomico.WriteAllText(path, content, Utf8WithoutBom);
     }
 }

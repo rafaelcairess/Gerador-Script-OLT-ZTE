@@ -9,7 +9,6 @@ on:
       versao:
         description: "Versão da release (ex.: v2.0.0)"
         required: true
-        default: "v2.0.0"
 
 permissions:
   contents: write
@@ -27,30 +26,111 @@ jobs:
         with:
           dotnet-version: "8.0.420"
 
+      - name: Definir e validar versão
+        id: versao
+        shell: pwsh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.versao }}
+          REF_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = if ($env:EVENT_NAME -eq "workflow_dispatch") {
+            $env:INPUT_VERSION
+          } else {
+            $env:REF_NAME
+          }
+
+          if ($tag -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$') {
+            throw "Versão inválida: '$tag'. Use o formato vMAJOR.MINOR.PATCH."
+          }
+
+          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            throw "A release $tag já existe. Escolha uma nova versão."
+          }
+
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "version=$($tag.Substring(1))" >> $env:GITHUB_OUTPUT
+
+      - name: Restaurar dependências
+        run: dotnet restore GeradorScriptsOltZte.sln --locked-mode
+
       - name: Executar testes
-        run: dotnet test GeradorScriptsOltZte.sln --configuration Release
+        run: dotnet test GeradorScriptsOltZte.sln --configuration Release --no-restore
 
       - name: Publicar executável autossuficiente
         run: >
           dotnet publish src/GeradorOlt.Apresentacao/GeradorOlt.Apresentacao.csproj
           --configuration Release
+          --no-restore
           --runtime win-x64
           --self-contained true
           -p:PublishSingleFile=true
           -p:IncludeNativeLibrariesForSelfExtract=true
           -p:DebugType=None
           -p:DebugSymbols=false
+          -p:Version=${{ steps.versao.outputs.version }}
+          -p:InformationalVersion=${{ steps.versao.outputs.version }}+${{ github.sha }}
           --output publicacao
 
-      - name: Definir versão
-        id: versao
-        shell: bash
+      - name: Assinar executável quando o certificado estiver configurado
+        shell: pwsh
+        env:
+          SIGNING_CERTIFICATE_BASE64: ${{ secrets.SIGNING_CERTIFICATE_BASE64 }}
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ github.event.inputs.versao }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-          fi
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_CERTIFICATE_BASE64)) {
+            Write-Host "::notice::Certificado não configurado; o executável será publicado sem assinatura Authenticode."
+            exit 0
+          }
+
+          $certificatePath = Join-Path $env:RUNNER_TEMP "gerador-olt-signing.pfx"
+          [IO.File]::WriteAllBytes(
+            $certificatePath,
+            [Convert]::FromBase64String($env:SIGNING_CERTIFICATE_BASE64))
+          try {
+            $signTool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1
+            if ($null -eq $signTool) {
+              throw "signtool.exe não encontrado no runner."
+            }
+
+            & $signTool.FullName sign /fd SHA256 /td SHA256 /tr http://timestamp.digicert.com `
+              /f $certificatePath /p $env:SIGNING_CERTIFICATE_PASSWORD publicacao/GeradorOlt-ZTE.exe
+            if ($LASTEXITCODE -ne 0) {
+              throw "Falha ao assinar o executável."
+            }
+          } finally {
+            Remove-Item -LiteralPath $certificatePath -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Validar executável publicado
+        shell: pwsh
+        run: |
+          $executable = Resolve-Path publicacao/GeradorOlt-ZTE.exe
+          $process = Start-Process `
+            -FilePath $executable `
+            -ArgumentList "--smoke-test" `
+            -Wait `
+            -PassThru `
+            -WindowStyle Hidden
+          if ($process.ExitCode -ne 0) {
+            throw "O teste de inicialização do executável falhou com código $($process.ExitCode)."
+          }
+
+          $productVersion = (Get-Item $executable).VersionInfo.ProductVersion
+          if (!$productVersion.StartsWith("${{ steps.versao.outputs.version }}")) {
+            throw "Versão do executável inesperada: $productVersion."
+          }
+
+      - name: Gerar checksum SHA-256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash publicacao/GeradorOlt-ZTE.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  GeradorOlt-ZTE.exe" |
+            Set-Content publicacao/GeradorOlt-ZTE.exe.sha256 -Encoding ascii
 
       - name: Criar release
         uses: softprops/action-gh-release@v2
@@ -66,8 +146,10 @@ jobs:
             ### Destaques
             - Interface nativa em WPF
             - Arquitetura MVVM
-            - Preview e validação em tempo real
+            - Preview e validação local em tempo real
             - Compatibilidade com perfis JSON da versão Python
           draft: false
           prerelease: false
-          files: publicacao/GeradorOlt-ZTE.exe
+          files: |
+            publicacao/GeradorOlt-ZTE.exe
+            publicacao/GeradorOlt-ZTE.exe.sha256

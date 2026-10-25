@@ -31,6 +31,7 @@ public sealed class TestesServicoPerfilJson : IDisposable
         Assert.Equal("300", loaded.Vlan);
         Assert.True(loaded.SecondaryService);
         Assert.Equal("400", loaded.SecondaryVlan);
+        Assert.Contains("\"versao\": 2", File.ReadAllText(path));
     }
 
     [Fact]
@@ -67,6 +68,35 @@ public sealed class TestesServicoPerfilJson : IDisposable
             () => new ServicoPerfilJson().Load(path));
 
         Assert.Contains("corrompido", exception.Message);
+    }
+
+    [Fact]
+    public void Load_RejectsProfileFromUnsupportedFutureVersion()
+    {
+        var path = Path.Combine(_directory, "perfil-futuro.json");
+        File.WriteAllText(path, """
+            {
+              "versao": 999,
+              "slot": "1"
+            }
+            """);
+
+        var exception = Assert.Throws<InvalidDataException>(
+            () => new ServicoPerfilJson().Load(path));
+
+        Assert.Contains("não suportada", exception.Message);
+    }
+
+    [Fact]
+    public void Save_AtomicallyOverwritesExistingProfile()
+    {
+        var path = Path.Combine(_directory, "perfil.json");
+        File.WriteAllText(path, "conteúdo anterior");
+
+        new ServicoPerfilJson().Save(path, new DadosPerfil { Vlan = "777" });
+
+        Assert.Equal("777", new ServicoPerfilJson().Load(path).Vlan);
+        Assert.Empty(Directory.GetFiles(_directory, "*.tmp"));
     }
 
     public void Dispose()

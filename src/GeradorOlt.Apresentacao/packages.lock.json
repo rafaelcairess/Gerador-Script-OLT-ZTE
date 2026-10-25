@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net8.0-windows7.0": {
+      "geradorolt.infraestrutura": {
+        "type": "Project",
+        "dependencies": {
+          "GeradorOlt.Nucleo": "[1.0.0, )"
+        }
+      },
+      "geradorolt.nucleo": {
+        "type": "Project"
+      }
+    },
+    "net8.0-windows7.0/win-x64": {}
+  }
+}

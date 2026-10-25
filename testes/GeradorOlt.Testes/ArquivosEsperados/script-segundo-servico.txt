@@ -1,0 +1,26 @@
+! ########################################################
+! ### INICIO CONFIGURACAO PON 1 / VLAN 100 ###
+! ########################################################
+
+! Configuracao ONU 1
+interface gpon_onu-1/2/1:1
+name cliente_1_1
+description cliente_1_1
+tcont 4 profile 1G
+gemport 1 name GEM1 tcont 4
+gemport 2 name GEM2 tcont 4
+exit
+interface vport-1/2/1.1:1
+service-port 1 user-vlan 100 vlan 100
+service-port 2 user-vlan 200 vlan 200
+exit
+pon-onu-mng gpon_onu-1/2/1:1
+service 1 gemport 1 vlan 100
+vlan port eth_0/1 mode tag vlan 100
+service 2 gemport 2 vlan 200
+vlan port eth_0/2 mode tag vlan 200
+exit
+
+! ########################################################
+! ### FIM CONFIGURACAO PON 1 / VLAN 100 ###
+! ########################################################

@@ -120,10 +120,25 @@ public sealed class TestesGeradorScriptZte
             AppContext.BaseDirectory,
             "ArquivosEsperados",
             "script-basico.txt");
-        var expected = File.ReadAllText(expectedPath).ReplaceLineEndings("\n");
+        var expected = File.ReadAllText(expectedPath).ReplaceLineEndings("\n").TrimEnd('\n');
 
         var result = _generator.Generate(CreateConfiguration());
-        var actual = result.Content.ReplaceLineEndings("\n");
+        var actual = result.Content.ReplaceLineEndings("\n").TrimEnd('\n');
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Generate_MatchesExpectedScriptWithSecondaryService()
+    {
+        var expectedPath = Path.Combine(
+            AppContext.BaseDirectory,
+            "ArquivosEsperados",
+            "script-segundo-servico.txt");
+        var expected = File.ReadAllText(expectedPath).ReplaceLineEndings("\n").TrimEnd('\n');
+
+        var result = _generator.Generate(CreateConfiguration(secondaryVlan: 200));
+        var actual = result.Content.ReplaceLineEndings("\n").TrimEnd('\n');
 
         Assert.Equal(expected, actual);
     }

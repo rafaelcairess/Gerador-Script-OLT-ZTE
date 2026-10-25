@@ -71,4 +71,50 @@ public sealed class TestesConfiguracaoViewModel
         Assert.True(viewModel.IsSecondaryServiceEnabled);
         Assert.Equal("701", viewModel.SecondaryVlan);
     }
+
+    [Fact]
+    public void NumericField_ExposesAndClearsInlineValidationError()
+    {
+        var viewModel = new ConfiguracaoViewModel
+        {
+            Vlan = "4095"
+        };
+
+        Assert.True(viewModel.HasErrors);
+        Assert.Contains("4094", Assert.Single(viewModel.GetErrors(nameof(viewModel.Vlan)).Cast<string>()));
+
+        viewModel.Vlan = "4094";
+
+        Assert.False(viewModel.HasErrors);
+        Assert.Empty(viewModel.GetErrors(nameof(viewModel.Vlan)).Cast<string>());
+    }
+
+    [Fact]
+    public void SecondaryVlan_IsRequiredOnlyWhenSecondaryServiceIsEnabled()
+    {
+        var viewModel = new ConfiguracaoViewModel();
+
+        viewModel.IsSecondaryServiceEnabled = true;
+
+        Assert.True(viewModel.HasErrors);
+        Assert.Single(viewModel.GetErrors(nameof(viewModel.SecondaryVlan)).Cast<string>());
+
+        viewModel.IsSecondaryServiceEnabled = false;
+
+        Assert.False(viewModel.HasErrors);
+    }
+
+    [Fact]
+    public void GetErrors_ReturnsAllErrorsAndDoesNotRepeatNotificationsForSameMessage()
+    {
+        var viewModel = new ConfiguracaoViewModel();
+        var notifications = 0;
+        viewModel.ErrorsChanged += (_, _) => notifications++;
+
+        viewModel.Vlan = "5000";
+        viewModel.Vlan = "5001";
+
+        Assert.Single(viewModel.GetErrors(null).Cast<string>());
+        Assert.Equal(1, notifications);
+    }
 }
