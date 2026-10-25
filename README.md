@@ -24,7 +24,7 @@ pronto para revisão, cópia ou exportação.
 > dos parâmetros. Ela não substitui a revisão técnica nem um teste controlado na
 > versão de firmware da OLT de destino.
 
-![Console de geração e validação de scripts para OLT ZTE](documentacao/interface-gerador-olt.png)
+![Console de geração e validação de scripts para OLT ZTE](documentacao/interface-gerador-olt-v2.png)
 
 <p align="center"><sub>Configuração validada à esquerda e script pronto para revisão à direita.</sub></p>
 
